@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<div class="mb-4 flex items-center gap-3">
+  <a href="/articles" class="text-indigo-600 dark:text-indigo-400 text-sm hover:underline">← 返回文章库</a>
+  {% if status_dict and status_dict.is_running %}
+  <span class="text-xs text-indigo-500">● 任务运行中</span>
+  {% endif %}
+</div>
+
+<div class="max-w-3xl">
+  <!-- Header card -->
+  <div class="card p-6 mb-4">
+    <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-3 flex-wrap">
+      <span>{{ article.source or 'Unknown' }}</span>
+      <span>·</span>
+      <span>{{ article.published_at.strftime('%Y-%m-%d %H:%M') if article.published_at else '—' }}</span>
+      {% if article.type_tag %}
+      <span>·</span>
+      <span class="badge bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{{ article.type_tag }}</span>
+      {% endif %}
+      {% if article.quality_score %}
+      <span>·</span>
+      <span>{{ article.quality_stars() }}</span>
+      {% endif %}
+      {% if article.credibility == 'ok' %}
+      <span class="badge bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">✓ 可信</span>
+      {% elif article.credibility == 'clickbait' %}
+        <span class="badge bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">⚠ 标题党</span>
+      {% elif article.credibility == 'exaggerated' %}
+      <span class="badge bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">⚠ {{ article.credibility }}</span>
+      {% endif %}
+    </div>
+
+    <h1 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ article.title }}</h1>
+
+    {% if article.summary %}
+    <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed border-l-4 border-indigo-400 pl-3 italic">
+      {{ article.summary }}
+    </p>
+    {% endif %}
+
+    {% if article.credibility_note %}
+    <div class="mt-3 px-3 py-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 text-xs">
+      ⚠️ {{ article.credibility_note }}
+    </div>
+    {% endif %}
+
+    {% set tags = article.topic_tags_list() %}
+    {% if tags %}
+    <div class="flex flex-wrap gap-1.5 mt-4">
+      {% for tag in tags %}
+      <a href="/articles?source={{ article.source }}" class="badge bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors">
+        #{{ tag }}
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="mt-4 flex items-center gap-3 flex-wrap">
+      <a href="{{ article.url }}" target="_blank" rel="noopener" class="btn-primary text-xs inline-flex items-center gap-1.5">
+        🔗 <span data-i18n="read_original">阅读原文</span>
+      </a>
+      {% if article.detailed_summary %}
+      <button type="button" onclick="regenSummary()" class="btn-secondary text-xs inline-flex items-center gap-1.5" id="regen-btn">
+        🔄 <span data-i18n="regen_summary">重新生成摘要</span>
+      </button>
+      {% elif not article.detailed_summary %}
+      <button type="button" onclick="regenSummary()" class="btn-secondary text-xs inline-flex items-center gap-1.5" id="regen-btn">
+        ✨ <span data-i18n="gen_summary">生成详细摘要</span>
+      </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Detailed summary -->
+  <div class="card p-6 mb-4">
+    <h2 class="font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+      🤖 <span>AI 深度解析</span>
+      {% if generated_summary %}
+      <span class="badge bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-xs">刚生成</span>
+      {% endif %}
+    </h2>
+
+    <div id="summary-content">
+      {% if article.detailed_summary %}
+      <div id="summary-md"
+           data-raw="{{ article.detailed_summary | replace('\n', '&#10;') | replace('\r', '') | e }}"
+           class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300 leading-relaxed">
+        <!-- rendered by marked.js on DOMContentLoaded -->
+      </div>
+      {% else %}
+      <div class="text-center py-6 text-slate-400 dark:text-slate-500 text-sm">
+        <div class="text-4xl mb-2">📝</div>
+        <p>还没有详细摘要。</p>
+        <a href="?generate=1" class="text-indigo-600 dark:text-indigo-400 hover:underline mt-2 inline-block">立即生成 →</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- 相关文章 -->
+  {% if related %}
+  <div class="card p-5">
+    <h2 class="font-semibold text-slate-900 dark:text-white mb-3">📎 相关文章</h2>
+    <div class="space-y-2">
+      {% for r in related %}
+      <a href="/articles/{{ r.id }}" class="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group">
+        <span class="text-slate-400 dark:text-slate-500 text-xs shrink-0 mt-0.5 w-20 whitespace-nowrap">
+          {{ r.published_at.strftime('%Y-%m-%d') if r.published_at else '—' }}
+        </span>
+        <div class="flex-1 min-w-0">
+          <span class="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-1">{{ r.title }}</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400 block">{{ r.source or '' }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  // Render any existing detailed_summary as Markdown
+  document.addEventListener('DOMContentLoaded', function() {
+    const el = document.getElementById('summary-md');
+    if (el && el.dataset.raw) {
+      // Restore newlines encoded as &#10; in the HTML attribute
+      const raw = el.dataset.raw.replace(/&#10;/g, '\n');
+      el.innerHTML = marked.parse(raw);
+    }
+  });
+
+  async function regenSummary() {
+    const btn = document.getElementById('regen-btn');
+    const content = document.getElementById('summary-content');
+    btn.disabled = true;
+    btn.textContent = '⏳ 生成中…';
+    content.innerHTML = '<div class="text-center py-6 text-slate-400 text-sm animate-pulse">🤖 AI 正在生成摘要…</div>';
+
+    try {
+      const res = await fetch('/articles/{{ article.id }}/regenerate', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        content.innerHTML = `<div class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300 leading-relaxed">${marked.parse(data.summary)}</div>`;
+        btn.textContent = '✅ 完成';
+      } else {
+        content.innerHTML = `<div class="text-red-500 text-sm">❌ ${data.error}</div>`;
+        btn.textContent = '🔄 重试';
+        btn.disabled = false;
+      }
+    } catch (e) {
+      content.innerHTML = '<div class="text-red-500 text-sm">❌ 请求失败</div>';
+      btn.textContent = '🔄 重试';
+      btn.disabled = false;
+    }
+  }
+</script>
+{% endblock %}

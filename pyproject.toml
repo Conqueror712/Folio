@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "wesum-pro"
+version = "1.0.0"
+description = "WeChat public account article reading and knowledge base tool"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Folio Contributors"}
+]
+keywords = ["wechat", "rss", "knowledge-base", "ai", "summarization"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Text Processing :: Markup :: HTML",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "flask>=3.0.0",
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.1.0",
+    "feedparser>=6.0.10",
+    "pyyaml>=6.0.1",
+    "click>=8.1.7",
+    "openai>=1.12.0",
+    "anthropic>=0.18.0",
+    "dashscope>=1.14.0",
+    "google-generativeai>=0.4.0",
+    "python-dateutil>=2.8.2",
+    "schedule>=1.2.0",
+    "python-slugify>=8.0.2",
+    "jinja2>=3.1.2",
+    "markupsafe>=2.1.3",
+    "chardet>=5.2.0",
+    "fake-useragent>=1.4.0",
+    "tqdm>=4.66.0",
+    "tenacity>=8.2.3",
+]
+
+[project.scripts]
+wesum = "cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/Folio"
+Documentation = "https://github.com/yourusername/Folio#readme"
+Repository = "https://github.com/yourusername/Folio"
+Issues = "https://github.com/yourusername/Folio/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["wesum*"]
+
+[tool.setuptools.package-data]
+wesum = ["py.typed"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.9"
+strict = false
+ignore_missing_imports = true

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}RSS 订阅{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">RSS 订阅管理</h1>
+    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">管理你的公众号 RSS 订阅源</p>
+  </div>
+  {% if status_dict and status_dict.is_running %}
+  <span class="inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400">
+    <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse inline-block"></span>
+    任务运行中…
+  </span>
+  {% endif %}
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Feed list -->
+  <div class="lg:col-span-2">
+    <div class="card overflow-hidden">
+      {% if feeds %}
+      <div class="divide-y divide-slate-100 dark:divide-slate-700">
+        {% for feed in feeds %}
+        <div class="px-5 py-4 flex items-center gap-4">
+          <div class="text-2xl shrink-0">{{ '📡' if feed.enabled else '⏸️' }}</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-slate-900 dark:text-white">{{ feed.name }}</div>
+            <div class="text-xs text-slate-400 dark:text-slate-500 truncate mt-0.5">{{ feed.url }}</div>
+            {% if feed.last_fetched_at %}
+            <div class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+              上次抓取：{{ feed.last_fetched_at.strftime('%Y-%m-%d %H:%M') if feed.last_fetched_at else '—' }}
+              · {{ feed.article_count }} 篇文章
+            </div>
+            {% endif %}
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <form action="/feeds/{{ feed.id }}/fetch" method="post">
+              <button type="submit" class="btn-secondary text-xs py-1 px-2.5" title="立即抓取">
+                🔄
+              </button>
+            </form>
+            <form action="/feeds/{{ feed.id }}/delete" method="post" onsubmit="return confirm('确认删除这个订阅？')">
+              <button type="submit" class="btn-danger text-xs py-1 px-2.5">删除</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="px-5 py-12 text-center text-slate-400 dark:text-slate-500">
+        <div class="text-4xl mb-2">📭</div>
+        <p>还没有订阅，在右侧添加第一个 RSS 源吧</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Add form + help -->
+  <div class="space-y-4">
+    <div class="card p-5">
+      <h2 class="font-semibold text-slate-900 dark:text-white mb-4">添加 RSS 订阅</h2>
+      <form action="/feeds/add" method="post">
+        <div class="mb-3">
+          <label class="label" for="feed-name">显示名称</label>
+          <input type="text" id="feed-name" name="name" class="input" placeholder="如：机器之心" />
+        </div>
+        <div class="mb-4">
+          <label class="label" for="feed-url">RSS 链接 <span class="text-red-500">*</span></label>
+          <input type="url" id="feed-url" name="url" class="input" placeholder="https://wechat2rss.zeabur.app/feed/..." required />
+        </div>
+        <button type="submit" class="btn-primary w-full">+ 添加订阅</button>
+      </form>
+    </div>
+
+    <div class="card p-5">
+      <h3 class="font-medium text-slate-900 dark:text-white mb-3">🔗 如何获取 RSS 链接</h3>
+      <ul class="text-xs space-y-2 text-slate-500 dark:text-slate-400">
+        <li><a href="https://wechat2rss.zeabur.app" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Wechat2RSS ↗</a> — 免费托管，支持 300+ 账号</li>
+        <li><a href="https://github.com/cooderl/wewe-rss" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">wewe-rss ↗</a> — 自托管，基于微信读书</li>
+        <li><a href="https://github.com/rachelos/we-mp-rss" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">we-mp-rss ↗</a> — 另一个自托管方案</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

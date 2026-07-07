@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}仪表盘{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+  <h1 class="text-2xl font-bold text-slate-900 dark:text-white">仪表盘</h1>
+  <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">你的公众号阅读知识库</p>
+</div>
+
+<!-- Welcome banner (shown when DB is empty or has only demo data) -->
+{% if stats.total_articles == 0 or (stats.total_articles <= 10 and demo_mode) %}
+<div class="mb-6 card border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20 p-5">
+  <div class="flex items-start gap-4">
+    <div class="text-4xl shrink-0">🦭</div>
+    <div class="flex-1">
+      <h2 class="font-semibold text-indigo-900 dark:text-indigo-200 text-lg mb-1">欢迎使用 Folio！</h2>
+      {% if stats.total_articles == 0 %}
+      <p class="text-indigo-700 dark:text-indigo-300 text-sm mb-3">知识库还是空的，3 步开始使用：</p>
+      {% else %}
+      <p class="text-indigo-700 dark:text-indigo-300 text-sm mb-3">当前显示的是<strong>演示数据</strong>，按以下步骤添加你自己的文章：</p>
+      {% endif %}
+      <ol class="text-sm text-indigo-800 dark:text-indigo-200 space-y-2">
+        <li class="flex gap-2">
+          <span class="font-bold shrink-0">①</span>
+          <span>前往 <a href="/settings" class="underline font-medium">设置</a> 填写 AI API Key
+          <span class="text-xs text-indigo-500 dark:text-indigo-400">— 推荐 DeepSeek（便宜且快）</span></span>
+        </li>
+        <li class="flex gap-2">
+          <span class="font-bold shrink-0">②</span>
+          <span><a href="/submit-url" class="underline font-medium">粘贴一篇公众号文章 URL</a> 或 <a href="/feeds" class="underline font-medium">添加 RSS 订阅</a></span>
+        </li>
+        <li class="flex gap-2">
+          <span class="font-bold shrink-0">③</span>
+          <span>点击下方的<strong>生成站点</strong>，导出你的个人知识库 HTML</span>
+        </li>
+      </ol>
+      {% if stats.total_articles > 0 %}
+      <form action="/clear-demo" method="post" class="mt-3">
+        <button type="submit" class="text-xs text-indigo-500 dark:text-indigo-400 hover:underline">
+          ✕ 清除演示数据
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Stats grid -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="card p-5">
+    <div class="text-2xl mb-1">📄</div>
+    <div class="text-3xl font-bold text-slate-900 dark:text-white">{{ stats.total_articles if stats.total_articles is defined else stats.total }}</div>
+    <div class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">文章总数</div>
+  </div>
+  <div class="card p-5">
+    <div class="text-2xl mb-1">✅</div>
+    <div class="text-3xl font-bold text-slate-900 dark:text-white">{{ stats.processed if stats.processed is defined else stats.total_articles }}</div>
+    <div class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">已处理</div>
+  </div>
+  <div class="card p-5">
+    <div class="text-2xl mb-1">📡</div>
+    <div class="text-3xl font-bold text-slate-900 dark:text-white">{{ stats.feeds if stats.feeds is defined else stats.total_feeds }}</div>
+    <div class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">RSS 订阅</div>
+  </div>
+  <div class="card p-5">
+    <div class="text-2xl mb-1">⏳</div>
+    <div class="text-3xl font-bold text-slate-900 dark:text-white">{{ stats.pending if stats.pending is defined else 0 }}</div>
+    <div class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">待处理</div>
+  </div>
+</div>
+
+<!-- Quick actions -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+  <a href="/submit-url" class="card p-4 hover:shadow-md transition-shadow flex items-center gap-3 cursor-pointer group">
+    <div class="text-2xl group-hover:scale-110 transition-transform">📥</div>
+    <div>
+      <div class="font-semibold text-slate-900 dark:text-white text-sm">添加文章</div>
+      <div class="text-xs text-slate-500 dark:text-slate-400">粘贴 URL</div>
+    </div>
+  </a>
+  <a href="/feeds" class="card p-4 hover:shadow-md transition-shadow flex items-center gap-3 cursor-pointer group">
+    <div class="text-2xl group-hover:scale-110 transition-transform">📡</div>
+    <div>
+      <div class="font-semibold text-slate-900 dark:text-white text-sm">管理订阅</div>
+      <div class="text-xs text-slate-500 dark:text-slate-400">{{ feeds | length }} 个订阅源</div>
+    </div>
+  </a>
+  <form action="/build" method="post" class="card p-4 hover:shadow-md transition-shadow flex items-center gap-3 cursor-pointer group">
+    <button type="submit" class="flex items-center gap-3 w-full text-left">
+      <div class="text-2xl group-hover:scale-110 transition-transform">🏗️</div>
+      <div>
+        <div class="font-semibold text-slate-900 dark:text-white text-sm">生成站点</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">导出静态 HTML</div>
+      </div>
+    </button>
+  </form>
+  <a href="/logs" class="card p-4 hover:shadow-md transition-shadow flex items-center gap-3 cursor-pointer group">
+    <div class="text-2xl group-hover:scale-110 transition-transform">📋</div>
+    <div>
+      <div class="font-semibold text-slate-900 dark:text-white text-sm">任务日志</div>
+      <div class="text-xs text-slate-500 dark:text-slate-400">
+        {% if status and status.is_running %}
+          <span class="text-indigo-600 dark:text-indigo-400">● 运行中</span>
+        {% else %}
+          空闲
+        {% endif %}
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- Recent articles -->
+<div class="card">
+  <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+    <h2 class="font-semibold text-slate-900 dark:text-white">最近文章</h2>
+    <a href="/articles" class="text-indigo-600 dark:text-indigo-400 text-sm hover:underline">查看全部 →</a>
+  </div>
+  <div class="divide-y divide-slate-100 dark:divide-slate-700">
+    {% if articles %}
+      {% for a in articles %}
+      <div class="px-5 py-3 flex items-start gap-3">
+        <div class="shrink-0 mt-0.5 text-sm w-10 text-left">
+          {% if a.quality_score == 3 %}⭐⭐⭐{% elif a.quality_score == 2 %}⭐⭐&nbsp;{% elif a.quality_score == 1 %}⭐&nbsp;&nbsp;{% else %}&mdash;&nbsp;&nbsp;{% endif %}
+        </div>
+        <div class="flex-1 min-w-0">
+          <a href="/articles/{{ a.id }}" class="font-medium text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 truncate block">
+            {{ a.title }}
+          </a>
+          <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
+            <span>{{ a.source or '—' }}</span>
+            <span>·</span>
+            <span>{{ a.published_at.strftime('%Y-%m-%d') if a.published_at else '—' }}</span>
+            {% if a.type_tag %}
+            <span>·</span>
+            <span class="badge bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{{ a.type_tag }}</span>
+            {% endif %}
+          </div>
+          {% if a.summary %}
+          <p class="text-sm text-slate-600 dark:text-slate-300 mt-1 line-clamp-1">{{ a.summary }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="px-5 py-10 text-center text-slate-400 dark:text-slate-500">
+        <div class="text-4xl mb-2">📭</div>
+        <p>还没有文章。<a href="/submit-url" class="text-indigo-600 dark:text-indigo-400 hover:underline">添加第一篇</a> 或 <a href="/feeds" class="text-indigo-600 dark:text-indigo-400 hover:underline">设置 RSS 订阅</a>。</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

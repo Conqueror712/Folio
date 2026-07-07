@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}设置{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+  <h1 class="text-2xl font-bold text-slate-900 dark:text-white">设置</h1>
+  <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">直接编辑 <code class="text-xs bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded">config.yaml</code>，修改后重启生效。</p>
+</div>
+
+<div class="max-w-3xl">
+  {% if error %}
+  <div class="mb-4 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700 text-sm">
+    ❌ YAML 格式错误：{{ error }}
+  </div>
+  {% endif %}
+
+  <form method="post">
+    <div class="card overflow-hidden mb-4">
+      <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 flex items-center justify-between">
+        <span class="text-sm font-medium text-slate-700 dark:text-slate-300 font-mono">config.yaml</span>
+        <span class="text-xs text-slate-400 dark:text-slate-500">YAML 格式</span>
+      </div>
+      <textarea
+        name="config_content"
+        class="w-full font-mono text-xs text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 p-4 focus:outline-none resize-none"
+        style="min-height: 520px; tab-size: 2;"
+        spellcheck="false"
+      >{{ config_content }}</textarea>
+    </div>
+
+    <div class="flex gap-3">
+      <button type="submit" class="btn-primary">💾 保存配置</button>
+      <a href="/" class="btn-secondary">取消</a>
+    </div>
+  </form>
+
+  <div class="mt-6 card p-5">
+    <h3 class="font-medium text-slate-900 dark:text-white mb-3">📋 AI 提供商速查</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600 dark:text-slate-300">
+      <div class="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3">
+        <div class="font-medium mb-1">DeepSeek（推荐）</div>
+        <code class="text-slate-500 dark:text-slate-400">provider: deepseek<br>model: deepseek-chat<br>api_key: sk-...</code>
+      </div>
+      <div class="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3">
+        <div class="font-medium mb-1">通义千问</div>
+        <code class="text-slate-500 dark:text-slate-400">provider: qwen<br>model: qwen-plus<br>api_key: YOUR_KEY</code>
+      </div>
+      <div class="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3">
+        <div class="font-medium mb-1">OpenAI / GPT</div>
+        <code class="text-slate-500 dark:text-slate-400">provider: openai<br>model: gpt-4o-mini<br>api_key: sk-...</code>
+      </div>
+      <div class="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3">
+        <div class="font-medium mb-1">Anthropic Claude</div>
+        <code class="text-slate-500 dark:text-slate-400">provider: claude<br>model: claude-3-haiku<br>api_key: sk-ant-...</code>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

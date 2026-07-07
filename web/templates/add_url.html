@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}添加文章{% endblock %}
+
+{% block content %}
+<div class="max-w-xl">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">添加文章</h1>
+    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">粘贴公众号文章链接，加入你的知识库</p>
+  </div>
+
+  <div class="card p-6">
+    <form method="post" id="add-form">
+      <div class="mb-5">
+        <label class="label" for="url">文章链接</label>
+        <input
+          type="url"
+          id="url"
+          name="url"
+          class="input"
+          style="color: #111827;"
+          placeholder="https://mp.weixin.qq.com/s/..."
+          required
+          autofocus
+        />
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">
+          支持微信公众号文章链接（mp.weixin.qq.com）及任意 RSS 来源的 URL
+        </p>
+      </div>
+
+      <div class="flex gap-3">
+        <button type="submit" class="btn-primary" id="submit-btn">
+          📥 添加到知识库
+        </button>
+        <a href="/articles" class="btn-secondary">取消</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="mt-6 card p-5">
+    <h3 class="font-medium text-slate-900 dark:text-white mb-3">💡 使用提示</h3>
+    <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-2">
+      <li class="flex gap-2">
+        <span class="text-indigo-500 shrink-0">①</span>
+        在浏览器中打开公众号文章，复制地址栏链接
+      </li>
+      <li class="flex gap-2">
+        <span class="text-indigo-500 shrink-0">②</span>
+        处理需要 5–15 秒：先抓取文章内容，再由 AI 分析摘要
+      </li>
+      <li class="flex gap-2">
+        <span class="text-indigo-500 shrink-0">③</span>
+        在 <a href="/logs" class="text-indigo-600 dark:text-indigo-400 hover:underline">任务日志</a> 里查看实时进度
+      </li>
+      <li class="flex gap-2">
+        <span class="text-indigo-500 shrink-0">④</span>
+        批量导入请用命令行：<code class="bg-slate-100 dark:bg-slate-700 px-1 rounded text-xs">python cli.py add-url "URL"</code>
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById('add-form').addEventListener('submit', function() {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ 处理中…';
+  });
+</script>
+{% endblock %}

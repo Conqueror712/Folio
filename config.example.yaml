@@ -1,0 +1,161 @@
+# Folio Configuration Example
+# Copy this file to config.yaml and fill in your settings.
+# cp config.example.yaml config.yaml
+
+# =============================================================================
+# AI Provider Configuration
+# =============================================================================
+#
+# 💡 RECOMMENDED FOR BEGINNERS: DeepSeek
+#   - Cheapest option available (about 0.1 yuan per 100 articles)
+#   - Has free trial credits upon registration
+#   - Sign up at: https://platform.deepseek.com
+#   - Uses OpenAI-compatible API format
+#
+# Other options: Alibaba Qwen (best for Chinese), OpenAI, Claude, Gemini
+#
+# =============================================================================
+
+ai:
+  # Available providers: deepseek | qwen | openai | claude | gemini
+  # Change this to match the section you fill in below.
+  provider: deepseek
+
+  # --- DeepSeek (RECOMMENDED — cheap, fast, great Chinese support) ---
+  # Get your API key at: https://platform.deepseek.com/api_keys
+  # Free trial credits available on registration.
+  deepseek:
+    api_key: "sk-your-deepseek-api-key-here"
+    model: "deepseek-chat"       # deepseek-chat is the standard model
+    base_url: "https://api.deepseek.com/v1"
+    max_tokens: 2048
+    temperature: 0.3
+
+  # --- Alibaba Cloud Qwen (Great for Chinese content) ---
+  # Get your API key at: https://dashscope.console.aliyun.com
+  qwen:
+    api_key: "sk-your-qwen-api-key-here"
+    model: "qwen-turbo"          # Options: qwen-turbo | qwen-plus | qwen-max
+    base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    max_tokens: 2048
+    temperature: 0.3
+
+  # --- OpenAI ---
+  # Get your API key at: https://platform.openai.com/api-keys
+  openai:
+    api_key: "sk-your-openai-api-key-here"
+    model: "gpt-4o-mini"         # Options: gpt-4o | gpt-4o-mini | gpt-3.5-turbo
+    base_url: "https://api.openai.com/v1"
+    max_tokens: 2048
+    temperature: 0.3
+
+  # --- Anthropic Claude ---
+  claude:
+    api_key: "sk-ant-your-claude-api-key-here"
+    model: "claude-3-5-haiku-20241022"
+    max_tokens: 2048
+    temperature: 0.3
+
+  # --- Google Gemini ---
+  gemini:
+    api_key: "your-gemini-api-key-here"
+    model: "gemini-1.5-flash"
+    max_tokens: 2048
+    temperature: 0.3
+
+# =============================================================================
+# RSS Subscriptions
+# Add WeChat public account RSS feeds here.
+# Compatible services: Wechat2RSS, wewe-rss, RSSHub, etc.
+# =============================================================================
+
+rss:
+  feeds:
+    - url: "https://your-rss-service.com/wechat/account1"
+      name: "公众号示例1"
+      enabled: true
+    - url: "https://your-rss-service.com/wechat/account2"
+      name: "公众号示例2"
+      enabled: true
+
+  # Fetch interval in minutes (default: 60)
+  fetch_interval: 60
+
+  # Maximum articles to fetch per feed per run
+  max_articles_per_feed: 20
+
+  # Request timeout in seconds
+  timeout: 30
+
+# =============================================================================
+# Processing Pipeline
+# =============================================================================
+
+processing:
+  # Enable/disable specific processing steps
+  summarize: true           # Generate one-sentence summary (required)
+  tag: true                 # AI tagging
+  score: true               # Quality scoring (1-3 stars)
+  credibility: true         # Credibility assessment
+  dedup: true               # Deduplication
+
+  # Deduplication thresholds
+  title_similarity_threshold: 0.85  # 0.0-1.0, higher = stricter
+
+  # Concurrency for batch processing
+  max_workers: 3
+
+# =============================================================================
+# Site Generation
+# =============================================================================
+
+site:
+  # Output directory for generated HTML
+  output_dir: "site"
+
+  # Site metadata
+  title: "Folio - My Knowledge Base"
+  description: "Personal knowledge base from WeChat public accounts"
+  author: "Your Name"
+  language: "zh-CN"
+
+  # Base URL for GitHub Pages deployment
+  # Leave empty for local file access (file://)
+  # Set to "https://yourusername.github.io/repo-name" for GitHub Pages
+  base_url: ""
+
+  # Number of articles per page
+  articles_per_page: 50
+
+  # Enable full-text search data generation
+  search: true
+
+  # Theme: light | dark | auto
+  default_theme: "auto"
+
+# =============================================================================
+# Database
+# =============================================================================
+
+database:
+  path: "data/wesum.db"
+
+# =============================================================================
+# Web UI (Flask)
+# =============================================================================
+
+web:
+  host: "127.0.0.1"
+  port: 8080
+  debug: false
+  secret_key: "change-this-to-a-random-secret-key"
+
+# =============================================================================
+# Logging
+# =============================================================================
+
+logging:
+  level: "INFO"   # DEBUG | INFO | WARNING | ERROR
+  file: "data/wesum.log"
+  max_size_mb: 10
+  backup_count: 3

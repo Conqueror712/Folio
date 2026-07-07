@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}文章库{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">文章库</h1>
+    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">共 {{ total }} 篇文章</p>
+  </div>
+  <a href="/submit-url" class="btn-primary">+ 添加文章</a>
+</div>
+
+<!-- Filters -->
+<div class="card p-4 mb-4">
+  <form method="get" class="flex flex-wrap gap-3 items-end">
+    <div>
+      <label class="label">状态</label>
+      <select name="status" class="input w-auto">
+        <option value="">全部</option>
+        <option value="processed" {% if status == 'processed' %}selected{% endif %}>已处理</option>
+        <option value="pending" {% if status == 'pending' %}selected{% endif %}>待处理</option>
+        <option value="error" {% if status == 'error' %}selected{% endif %}>出错</option>
+      </select>
+    </div>
+    <div>
+      <label class="label">来源</label>
+      <select name="source" class="input w-auto">
+        <option value="">全部来源</option>
+        {% for s in sources %}
+        <option value="{{ s }}" {% if s == source_filter %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn-primary">筛选</button>
+    {% if status or source_filter %}
+    <a href="/articles" class="btn-secondary">清除</a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Table -->
+<div class="card overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 dark:bg-slate-700/50 text-left">
+        <tr>
+          <th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300 w-28">日期</th>
+          <th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300">标题</th>
+          <th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300 w-32">来源</th>
+          <th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300">一句话摘要</th>
+          <th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300 w-24">类型</th>
+          <th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300 w-24 text-center">质量</th>
+          <th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300 w-28 text-center">可信度</th>
+          <th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300 w-20">详情</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+        {% if articles %}
+          {% for a in articles %}
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+            <td class="px-4 py-3 text-slate-500 dark:text-slate-400 text-xs whitespace-nowrap">
+              {{ a.published_at.strftime('%Y-%m-%d') if a.published_at else '—' }}
+            </td>
+            <td class="px-4 py-3">
+              <a href="/articles/{{ a.id }}" class="font-medium text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 block">
+                {{ a.title }}
+              </a>
+            </td>
+            <td class="px-4 py-3 text-slate-600 dark:text-slate-300 text-xs">{{ a.source or '—' }}</td>
+            <td class="px-4 py-3 text-slate-600 dark:text-slate-300 text-xs line-clamp-2">{{ a.summary or '—' }}</td>
+            <td class="px-4 py-3">
+              {% if a.type_tag %}
+              <span class="badge
+                {% if a.type_tag in ['广告', 'ad', '带货'] %}bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300
+                {% elif a.type_tag in ['干货', '教程', 'tutorial'] %}bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300
+                {% elif a.type_tag in ['新闻', 'news'] %}bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300
+                {% else %}bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300{% endif %}">
+                {{ a.type_tag }}
+              </span>
+              {% else %}—{% endif %}
+            </td>
+            <td class="px-4 py-3 text-center text-sm">
+              {{ a.quality_stars() if a.quality_score else '—' }}
+            </td>
+            <td class="px-4 py-3 text-center">
+              {% if a.credibility == 'ok' %}
+                <span class="badge bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">✓ 可信</span>
+              {% elif a.credibility == 'clickbait' %}
+                <span class="badge bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">⚠ 标题党</span>
+              {% elif a.credibility == 'exaggerated' %}
+                <span class="badge bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">⚠ 夸大</span>
+              {% else %}
+                <span class="badge bg-slate-100 dark:bg-slate-700 text-slate-500">—</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3">
+              <a href="/articles/{{ a.id }}" class="text-indigo-600 dark:text-indigo-400 hover:underline text-xs">
+                查看 →
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" class="px-4 py-12 text-center text-slate-400 dark:text-slate-500">
+              <div class="text-3xl mb-2">🔍</div>
+              没有找到文章。试试调整筛选条件或 <a href="/submit-url" class="text-indigo-600 dark:text-indigo-400 hover:underline">手动添加一篇</a>。
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if total > per_page %}
+  <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+    <span class="text-sm text-slate-500 dark:text-slate-400">
+      显示第 {{ (page - 1) * per_page + 1 }}–{{ [page * per_page, total] | min }} 条，共 {{ total }} 条
+    </span>
+    <div class="flex gap-2">
+      {% if page > 1 %}
+      <a href="?page={{ page - 1 }}&status={{ status or '' }}&source={{ source_filter or '' }}" class="btn-secondary text-xs">← 上一页</a>
+      {% endif %}
+      {% if page * per_page < total %}
+      <a href="?page={{ page + 1 }}&status={{ status or '' }}&source={{ source_filter or '' }}" class="btn-secondary text-xs">下一页 →</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

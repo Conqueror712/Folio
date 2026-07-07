@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}任务日志{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">任务日志</h1>
+    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
+      {% if is_running %}
+        <span class="inline-flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
+          <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse inline-block"></span>
+          任务运行中…
+        </span>
+      {% else %}
+        暂无运行中的任务
+      {% endif %}
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <form action="/fetch" method="post">
+      <button class="btn-secondary text-xs">🔄 抓取 RSS</button>
+    </form>
+    <form action="/build" method="post">
+      <button class="btn-primary text-xs">🏗️ 生成站点</button>
+    </form>
+  </div>
+</div>
+
+<div class="card overflow-hidden">
+  <div id="log-container" class="font-mono text-xs divide-y divide-slate-100 dark:divide-slate-700/50 max-h-[600px] overflow-y-auto">
+    {% if logs %}
+      {% for entry in logs %}
+      <div class="px-4 py-2 flex gap-3
+        {% if entry.level == 'error' %}bg-red-50 dark:bg-red-900/10
+        {% elif entry.level == 'warning' %}bg-yellow-50 dark:bg-yellow-900/10
+        {% else %}bg-transparent{% endif %}">
+        <span class="text-slate-400 dark:text-slate-500 shrink-0 w-20">{{ entry.ts[11:19] }}</span>
+        <span class="{% if entry.level == 'error' %}text-red-600 dark:text-red-400
+          {% elif entry.level == 'warning' %}text-yellow-600 dark:text-yellow-400
+          {% else %}text-slate-700 dark:text-slate-300{% endif %}">{{ entry.msg }}</span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="px-4 py-10 text-center text-slate-400 dark:text-slate-500 font-sans">
+        暂无日志。执行抓取或生成任务后会在此显示。
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<p class="text-xs text-slate-400 dark:text-slate-500 mt-2 text-right" id="last-refresh">
+  任务运行时每 3 秒自动刷新
+</p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let polling = {% if is_running %}true{% else %}false{% endif %};
+
+  async function refreshLog() {
+    try {
+      const res = await fetch('/api/task-log');
+      const data = await res.json();
+      const container = document.getElementById('log-container');
+      if (data.logs.length === 0) return;
+
+      container.innerHTML = data.logs.map(entry => {
+        const levelClass = entry.level === 'error'
+          ? 'bg-red-50 dark:bg-red-900/10'
+          : entry.level === 'warning'
+          ? 'bg-yellow-50 dark:bg-yellow-900/10'
+          : '';
+        const textClass = entry.level === 'error'
+          ? 'text-red-600 dark:text-red-400'
+          : entry.level === 'warning'
+          ? 'text-yellow-600 dark:text-yellow-400'
+          : 'text-slate-700 dark:text-slate-300';
+        const time = entry.ts.substring(11, 19);
+        return `<div class="px-4 py-2 flex gap-3 ${levelClass}">
+          <span class="text-slate-400 dark:text-slate-500 shrink-0 w-20">${time}</span>
+          <span class="${textClass}">${entry.msg}</span>
+        </div>`;
+      }).join('');
+
+      document.getElementById('last-refresh').textContent =
+        `上次更新：${new Date().toLocaleTimeString()}`;
+
+      polling = data.is_running;
+      if (!polling) {
+        setTimeout(refreshLog, 1500);
+      }
+    } catch (e) {}
+  }
+
+  if (polling) {
+    setInterval(() => { if (polling) refreshLog(); }, 3000);
+  }
+</script>
+{% endblock %}

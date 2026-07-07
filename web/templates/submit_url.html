@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}提交文章 URL{% endblock %}
+
+{% block content %}
+<div class="max-w-xl">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">提交文章 URL</h1>
+    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">粘贴公众号文章链接，AI 自动摘要并存入知识库</p>
+  </div>
+
+  {% if status_dict and status_dict.is_running %}
+  <div class="mb-4 flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 card p-3">
+    <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse inline-block"></span>
+    有任务正在运行，你的提交将进入队列等待处理。
+  </div>
+  {% endif %}
+
+  <div class="card p-6">
+    <form method="post" id="submit-form">
+      <div class="mb-5">
+        <label class="label" for="url">文章链接 <span class="text-red-500">*</span></label>
+        <input
+          type="url"
+          id="url"
+          name="url"
+          class="input text-gray-900 dark:text-gray-100"
+          style="color: #111827;"
+          placeholder="https://mp.weixin.qq.com/s/..."
+          required
+          autofocus
+        />
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">
+          粘贴任意公众号文章的完整链接，系统将自动抓取、分析并添加到你的知识库。
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="btn-primary" id="submit-btn">📥 添加到知识库</button>
+        <a href="/articles" class="btn-secondary">取消</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="mt-6 card p-5">
+    <h3 class="font-medium text-slate-900 dark:text-white mb-3">💡 如何获取文章链接</h3>
+    <ol class="text-sm text-slate-600 dark:text-slate-300 space-y-2 list-none">
+      <li class="flex gap-2"><span class="text-indigo-500 shrink-0 font-bold">1.</span> 在微信中打开文章，点击右上角「...」→「复制链接」</li>
+      <li class="flex gap-2"><span class="text-indigo-500 shrink-0 font-bold">2.</span> 或在浏览器中打开文章，复制地址栏链接</li>
+      <li class="flex gap-2"><span class="text-indigo-500 shrink-0 font-bold">3.</span> 粘贴到上方输入框，点击「添加到知识库」</li>
+      <li class="flex gap-2"><span class="text-indigo-500 shrink-0 font-bold">4.</span> 在 <a href="/logs" class="text-indigo-600 dark:text-indigo-400 hover:underline">任务日志</a> 里查看处理进度</li>
+    </ol>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById('submit-form').addEventListener('submit', function() {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ 提交中…';
+  });
+</script>
+{% endblock %}

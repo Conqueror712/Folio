@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}任务日志{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">任务日志</h1>
+    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
+      {% if status_dict and status_dict.is_running %}
+        <span class="inline-flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
+          <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse inline-block"></span>
+          任务运行中…
+        </span>
+      {% else %}
+        暂无运行中的任务
+      {% endif %}
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <a href="/submit-url" class="btn-secondary text-xs">📥 添加文章</a>
+    <form action="/build" method="post"><button class="btn-primary text-xs">🏗️ 生成站点</button></form>
+  </div>
+</div>
+
+<!-- Active task history -->
+{% if task_history %}
+<div class="card mb-4">
+  <div class="px-5 py-3 border-b border-slate-200 dark:border-slate-700">
+    <h2 class="font-semibold text-sm text-slate-700 dark:text-slate-300">本次会话任务</h2>
+  </div>
+  <div class="divide-y divide-slate-100 dark:divide-slate-700">
+    {% for task in task_history | reverse %}
+    <div class="px-5 py-3 flex items-center gap-3 text-sm">
+      <span class="
+        {% if task.status == 'done' %}text-green-600 dark:text-green-400
+        {% elif task.status == 'error' %}text-red-600 dark:text-red-400
+        {% elif task.status == 'running' %}text-indigo-600 dark:text-indigo-400
+        {% else %}text-slate-500{% endif %}
+        text-lg shrink-0">
+        {% if task.status == 'done' %}✅
+        {% elif task.status == 'error' %}❌
+        {% elif task.status == 'running' %}⏳
+        {% else %}⏸️{% endif %}
+      </span>
+      <div class="flex-1 font-mono text-xs text-slate-700 dark:text-slate-300">{{ task.action }}</div>
+      <div class="text-xs text-slate-400 dark:text-slate-500">
+        {% if task.get('message') %}{{ task.message }}{% endif %}
+        {% if task.get('new') %}+{{ task.new }} 篇新文章{% endif %}
+        {% if task.get('error') %}<span class="text-red-500">{{ task.error[:60] }}</span>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Processing logs -->
+<div class="card overflow-hidden">
+  <div class="px-5 py-3 border-b border-slate-200 dark:border-slate-700">
+    <h2 class="font-semibold text-sm text-slate-700 dark:text-slate-300">处理历史</h2>
+  </div>
+  <div class="overflow-x-auto">
+    {% if logs %}
+    <table class="w-full text-xs font-mono">
+      <thead class="bg-slate-50 dark:bg-slate-700/50 text-left">
+        <tr>
+          <th class="px-4 py-2 font-medium text-slate-500 w-40">时间</th>
+          <th class="px-4 py-2 font-medium text-slate-500 w-24">操作</th>
+          <th class="px-4 py-2 font-medium text-slate-500 w-20">状态</th>
+          <th class="px-4 py-2 font-medium text-slate-500">URL / 消息</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+        {% for log in logs %}
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/20">
+          <td class="px-4 py-2 text-slate-400 dark:text-slate-500 whitespace-nowrap">
+            {{ log.created_at.strftime('%m-%d %H:%M:%S') if log.created_at else '—' }}
+          </td>
+          <td class="px-4 py-2 text-slate-600 dark:text-slate-300">{{ log.action }}</td>
+          <td class="px-4 py-2">
+            <span class="badge
+              {% if log.status == 'success' %}bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300
+              {% elif log.status == 'error' %}bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300
+              {% else %}bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300{% endif %}">
+              {% if log.status == 'success' %}成功{% elif log.status == 'error' %}失败{% else %}{{ log.status }}{% endif %}
+            </span>
+          </td>
+          <td class="px-4 py-2 text-slate-500 dark:text-slate-400 truncate max-w-xs">
+            {{ log.message or log.article_url or '—' }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="px-4 py-10 text-center text-slate-400 dark:text-slate-500 font-sans">
+      暂无日志记录。
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if status_dict and status_dict.is_running %}
+<script>
+  setTimeout(() => location.reload(), 4000);
+</script>
+{% endif %}
+
+<script>
+(function() {
+  let wasRunning = {% if status_dict and status_dict.is_running %}true{% else %}false{% endif %};
+  setInterval(async function() {
+    try {
+      const r = await fetch('/api/status');
+      const d = await r.json();
+      const isRunning = d.is_running || d.queue > 0;
+      if (isRunning || isRunning !== wasRunning) {
+        location.reload();
+      }
+      wasRunning = isRunning;
+    } catch(e) {}
+  }, 2500);
+})();
+</script>
+{% endblock %}

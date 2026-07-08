@@ -63,12 +63,7 @@ ai:
 python app.py  # 启动后在浏览器中打开 http://localhost:8080
 ```
 
-**方式 B — 手动提交 URL：**
-```bash
-python cli.py add-url "https://mp.weixin.qq.com/s/your-article-url"
-```
-
-**方式 C — RSS 订阅（需先配置 RSS 服务，见下文 [🔧 RSS 服务配置](#rss-服务配置)）：**
+**方式 B — RSS 订阅（可选，需先配置 RSS 服务，见下文 🔧 [RSS 服务配置](#rss-服务配置)）：**
 ```bash
 python cli.py add-rss "https://your-rss-service/feed" --name "公众号名称"
 python cli.py fetch
@@ -77,6 +72,8 @@ python cli.py fetch
 > 注：RSS 是一种聚合协议，可以将公众号的文章聚合，然后通过 Folio 的 RSS 订阅功能自动拉取新文章。
 
 ### Step 4. 构建并预览
+
+> 注：构建之前，请确保你已经添加了至少一篇文章。
 
 ```bash
 python cli.py build

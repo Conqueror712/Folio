@@ -58,17 +58,12 @@ ai:
 
 ### Step 3. Add Articles
 
-**Option A — Web UI (recommended):**
+**Option A — Web UI (Recommended):**
 ```bash
 python app.py  # Open http://localhost:8080 in your browser
 ```
 
-**Option B — Manual URL:**
-```bash
-python cli.py add-url "https://mp.weixin.qq.com/s/your-article-url"
-```
-
-**Option C — RSS Feed (requires RSS service setup first, see [🔧 RSS Service Setup](#-rss-service-setup)):**
+**Option B — RSS Feed (Optional, requires RSS service setup first, see 🔧 [RSS Service Setup](#-rss-service-setup)):**
 ```bash
 python cli.py add-rss "https://your-rss-service/feed" --name "Account Name"
 python cli.py fetch
@@ -76,7 +71,9 @@ python cli.py fetch
 
 > Note: RSS is a feed aggregation protocol that allows Folio to automatically pull new articles from WeChat public accounts.
 
-### Step 4. Build & Preview
+### Step 4. Build & Pre
+
+> Note: Before building, ensure you have added at least one article.
 
 ```bash
 python cli.py build

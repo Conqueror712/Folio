@@ -28,8 +28,8 @@ ai:
     api_key: "sk-your-deepseek-api-key-here"
     model: "deepseek-chat"       # deepseek-chat is the standard model
     base_url: "https://api.deepseek.com/v1"
-    max_tokens: 2048
-    temperature: 0.3
+    max_tokens: 4096
+    temperature: 0.5
 
   # --- Alibaba Cloud Qwen (Great for Chinese content) ---
   # Get your API key at: https://dashscope.console.aliyun.com
@@ -37,8 +37,8 @@ ai:
     api_key: "sk-your-qwen-api-key-here"
     model: "qwen-turbo"          # Options: qwen-turbo | qwen-plus | qwen-max
     base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
-    max_tokens: 2048
-    temperature: 0.3
+    max_tokens: 4096
+    temperature: 0.5
 
   # --- OpenAI ---
   # Get your API key at: https://platform.openai.com/api-keys
@@ -46,22 +46,22 @@ ai:
     api_key: "sk-your-openai-api-key-here"
     model: "gpt-4o-mini"         # Options: gpt-4o | gpt-4o-mini | gpt-3.5-turbo
     base_url: "https://api.openai.com/v1"
-    max_tokens: 2048
-    temperature: 0.3
+    max_tokens: 4096
+    temperature: 0.5
 
   # --- Anthropic Claude ---
   claude:
     api_key: "sk-ant-your-claude-api-key-here"
     model: "claude-3-5-haiku-20241022"
-    max_tokens: 2048
-    temperature: 0.3
+    max_tokens: 4096
+    temperature: 0.5
 
   # --- Google Gemini ---
   gemini:
     api_key: "your-gemini-api-key-here"
     model: "gemini-1.5-flash"
-    max_tokens: 2048
-    temperature: 0.3
+    max_tokens: 4096
+    temperature: 0.5
 
 # =============================================================================
 # RSS Subscriptions

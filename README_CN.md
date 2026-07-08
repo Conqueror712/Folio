@@ -20,6 +20,10 @@
 
 ---
 
+<p align="center">
+  <img src="web/static/img/demo_img.png" alt="Folio 界面预览" width="860">
+</p>
+
 ## ✨ 功能特性
 
 - 📥 **双入口采集**：RSS 自动拉取（需 Wechat2RSS / wewe-rss）+ 手动提交 URL

@@ -20,6 +20,10 @@
 
 ---
 
+<p align="center">
+  <img src="web/static/img/demo_img.png" alt="Folio Demo" width="860">
+</p>
+
 ## ✨ Features
 
 - 📥 **Dual ingestion**: RSS auto-fetch (via Wechat2RSS / wewe-rss) + manual URL submission

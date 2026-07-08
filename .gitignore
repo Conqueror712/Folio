@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Data and generated site
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+site/*.html
+site/articles/*.html
+site/category/*.html
+site/search.json
+site/assets/*
+!site/.gitkeep
+!data/.gitkeep
+site/wesum.log
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

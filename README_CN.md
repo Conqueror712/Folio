@@ -60,8 +60,10 @@ ai:
 
 **方式 A — Web 管理界面（推荐）：**
 ```bash
-python app.py  # 启动后在浏览器中打开 http://localhost:8080
+python app.py
 ```
+
+> 注：启动后在浏览器中打开 http://localhost:8080
 
 **方式 B — RSS 订阅（可选，需先配置 RSS 服务，见下文 🔧 [RSS 服务配置](#rss-服务配置)）：**
 ```bash
@@ -78,7 +80,7 @@ python cli.py fetch
 ```bash
 python cli.py build
 python cli.py serve
-# 打开 http://localhost:8000
+# 打开 http://localhost:8000（注意不是 8080）
 ```
 
 ## 📖 CLI 命令参考

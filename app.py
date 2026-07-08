@@ -396,6 +396,7 @@ def api_status():
     return jsonify(get_status())
 
 
+
 @app.route("/api/stats")
 def api_stats():
     """JSON statistics endpoint."""

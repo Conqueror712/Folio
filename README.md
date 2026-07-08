@@ -60,8 +60,10 @@ ai:
 
 **Option A — Web UI (Recommended):**
 ```bash
-python app.py  # Open http://localhost:8080 in your browser
+python app.py
 ```
+
+> Note: After starting, open http://localhost:8080 in your browser.
 
 **Option B — RSS Feed (Optional, requires RSS service setup first, see 🔧 [RSS Service Setup](#-rss-service-setup)):**
 ```bash
@@ -78,7 +80,7 @@ python cli.py fetch
 ```bash
 python cli.py build
 python cli.py serve
-# Open http://localhost:8000
+# Open http://localhost:8000 (Not 8080)
 ```
 
 ## 📖 CLI Reference

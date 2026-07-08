@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Folio{% endblock %}</title>
+  <title>{% block title %}Folio{% endblock %} — Folio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -12,142 +12,221 @@
         extend: {
           fontFamily: {
             sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', '"PingFang SC"', '"Hiragino Sans GB"', '"Microsoft YaHei"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', '"Fira Code"', 'Menlo', 'monospace'],
+          },
+          colors: {
+            sidebar: {
+              bg: '#0f1117',
+              hover: '#1a1d27',
+              active: '#1e2235',
+              border: '#1e2235',
+              text: '#8b92a5',
+              accent: '#6366f1',
+            }
           }
         }
       }
     }
   </script>
   <style>
-    .nav-link { @apply text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors; }
-    .card { @apply bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm; }
-    .btn { @apply inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none; }
-    .btn-primary { @apply btn bg-indigo-600 hover:bg-indigo-700 text-white; }
-    .btn-secondary { @apply btn bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600; }
-    .btn-danger { @apply btn bg-red-600 hover:bg-red-700 text-white; }
-    .input { @apply w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400; color: #111827; }
-    .label { @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1; }
-    .badge { @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium; }
-    /* Markdown prose rendering */
+    /* Layout */
+    body { display: flex; min-height: 100vh; }
+    #sidebar { width: 220px; flex-shrink: 0; }
+    #main { flex: 1; min-width: 0; }
+
+    /* Sidebar nav items */
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 12px; border-radius: 8px; font-size: 0.875rem;
+      color: #8b92a5; cursor: pointer; transition: all 0.15s;
+      text-decoration: none; font-weight: 500;
+    }
+    .nav-item:hover { background: #1a1d27; color: #e2e8f0; }
+    .nav-item.active { background: #1e2235; color: #e2e8f0; }
+    .nav-item.active .nav-icon { color: #6366f1; }
+    .nav-section { font-size: 0.7rem; font-weight: 600; color: #4b5563;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 16px 12px 6px; }
+
+    /* Primary action button in sidebar */
+    .nav-cta {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 14px; border-radius: 8px; font-size: 0.875rem;
+      background: #6366f1; color: #fff; font-weight: 600;
+      cursor: pointer; transition: background 0.15s; text-decoration: none;
+      margin-bottom: 4px;
+    }
+    .nav-cta:hover { background: #4f46e5; }
+
+    /* Cards & UI */
+    .card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
+    .dark .card { background: #161b2e; border-color: #1e2a45; }
+    .btn { display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 8px; font-size: 0.875rem;
+      font-weight: 500; transition: all 0.15s; cursor: pointer; }
+    .btn-primary { background: #6366f1; color: white; }
+    .btn-primary:hover { background: #4f46e5; }
+    .btn-secondary { background: white; border: 1px solid #e5e7eb;
+      color: #374151; }
+    .btn-secondary:hover { background: #f9fafb; }
+    .dark .btn-secondary { background: #1e2a45; border-color: #2d3a55; color: #cbd5e1; }
+    .dark .btn-secondary:hover { background: #253045; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .input { width: 100%; border-radius: 8px; border: 1px solid #d1d5db;
+      background: white; padding: 8px 12px; font-size: 0.875rem;
+      color: #111827; outline: none; transition: border 0.15s; }
+    .input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+    .dark .input { background: #1e2a45; border-color: #2d3a55; color: #e2e8f0; }
+    .dark .input:focus { border-color: #6366f1; }
+    .label { display: block; font-size: 0.8125rem; font-weight: 500;
+      color: #374151; margin-bottom: 5px; }
+    .dark .label { color: #94a3b8; }
+    .badge { display: inline-flex; align-items: center;
+      padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 500; }
+
+    /* Markdown prose */
     .prose h1,.prose h2,.prose h3 { font-weight: 700; margin: 0.75em 0 0.25em; }
     .prose h2 { font-size: 1rem; color: #1e293b; }
     .prose strong { font-weight: 700; color: #1e293b; }
-    .prose p { margin: 0.5em 0; line-height: 1.7; }
+    .prose p { margin: 0.5em 0; line-height: 1.75; }
     .prose ul,.prose ol { padding-left: 1.25em; margin: 0.4em 0; }
     .prose li { margin: 0.2em 0; }
     .prose code { background: #f1f5f9; padding: 0.1em 0.3em; border-radius: 4px; font-size: 0.85em; }
     .dark .prose strong,.dark .prose h2 { color: #e2e8f0; }
-    .dark .prose code { background: #334155; }
+    .dark .prose code { background: #1e2a45; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2d3a55; border-radius: 2px; }
   </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
-  <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-14">
-        <a href="{{ url_for('index') }}" class="flex items-center gap-2 font-bold text-indigo-600 dark:text-indigo-400 text-lg">
-          <span>📚</span>
-          <span>Folio</span>
-        </a>
-        <div class="hidden md:flex items-center gap-6">
-          <a href="{{ url_for('index') }}" class="nav-link" data-i18n="nav_dashboard">仪表盘</a>
-          <a href="{{ url_for('articles') }}" class="nav-link" data-i18n="nav_articles">文章库</a>
-          <a href="{{ url_for('feeds') }}" class="nav-link" data-i18n="nav_feeds">订阅源</a>
-          <a href="{{ url_for('submit_url') }}" class="nav-link" data-i18n="nav_submit">提交URL</a>
-          <a href="{{ url_for('logs') }}" class="nav-link" data-i18n="nav_logs">日志</a>
-          <a href="{{ url_for('settings') }}" class="nav-link" data-i18n="nav_settings">设置</a>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="hidden sm:flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-            <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 rounded">
-              {{ (status_dict.processed if status_dict is defined else 0) }} <span data-i18n="unit_articles">文章</span>
-            </span>
-            <span class="px-2 py-1 bg-green-50 dark:bg-green-900/30 rounded">
-              {{ (status_dict.feeds if status_dict is defined else 0) }} <span data-i18n="unit_feeds">订阅</span>
-            </span>
-          </div>
-          <!-- Language toggle removed: UI is now fully in Chinese -->
-          <!-- Theme toggle -->
-          <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="切换主题">
-            <span id="theme-icon">🌙</span>
-          </button>
-        </div>
+<body class="bg-gray-50 dark:bg-[#0a0d16] text-gray-900 dark:text-gray-100">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside id="sidebar" class="bg-[#0f1117] flex flex-col h-screen sticky top-0 overflow-y-auto">
+    <!-- Logo -->
+    <div class="px-4 py-5 flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">F</div>
+      <span class="font-bold text-white text-base tracking-tight">Folio</span>
+    </div>
+
+    <!-- Primary CTA: Add Article -->
+    <div class="px-3 mb-1">
+      <a href="{{ url_for('submit_url') }}" class="nav-cta">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        添加文章
+      </a>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 px-3">
+      <div class="nav-section">内容</div>
+      <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        首页
+      </a>
+      <a href="{{ url_for('articles') }}" class="nav-item {% if request.endpoint == 'articles' %}active{% endif %}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        文章库
+        {% if status_dict is defined and status_dict.processed %}
+        <span class="ml-auto text-xs text-[#4b5563]">{{ status_dict.processed }}</span>
+        {% endif %}
+      </a>
+      <a href="{{ url_for('feeds') }}" class="nav-item {% if request.endpoint == 'feeds' %}active{% endif %}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+        RSS 订阅
+        {% if status_dict is defined and status_dict.feeds %}
+        <span class="ml-auto text-xs text-[#4b5563]">{{ status_dict.feeds }}</span>
+        {% endif %}
+      </a>
+
+      <div class="nav-section">管理</div>
+      <a href="{{ url_for('logs') }}" class="nav-item {% if request.endpoint == 'logs' %}active{% endif %}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        任务日志
+        {% if status_dict is defined and status_dict.is_running %}
+        <span class="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+        {% endif %}
+      </a>
+      <a href="{{ url_for('settings') }}" class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        设置
+      </a>
+    </nav>
+
+    <!-- Bottom: build + theme -->
+    <div class="px-3 pb-4 space-y-1">
+      <div class="border-t border-[#1e2235] mb-3"></div>
+      <form action="/build" method="post">
+        <button type="submit" class="nav-item w-full text-left hover:text-emerald-400">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+          生成站点
+        </button>
+      </form>
+      <button id="theme-toggle" class="nav-item w-full text-left">
+        <svg id="icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon hidden"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <span id="theme-label">深色模式</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Main content ───────────────────────────────────────── -->
+  <div id="main" class="flex flex-col min-h-screen">
+    <!-- Top bar -->
+    <header class="sticky top-0 z-40 bg-white/80 dark:bg-[#0a0d16]/80 backdrop-blur border-b border-gray-100 dark:border-[#1e2235] px-8 py-3 flex items-center justify-between">
+      <div></div>
+      <div class="flex items-center gap-4 text-xs text-gray-400 dark:text-[#4b5563]">
+        {% if status_dict is defined %}
+        <span class="flex items-center gap-1.5">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          {{ status_dict.processed }} 篇文章
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+          {{ status_dict.feeds }} 个订阅
+        </span>
+        {% if status_dict.is_running %}
+        <span class="flex items-center gap-1.5 text-indigo-500">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse inline-block"></span>
+          运行中
+        </span>
+        {% endif %}
+        {% endif %}
       </div>
-    </div>
-    <!-- Mobile menu -->
-    <div class="md:hidden border-t border-gray-100 dark:border-gray-700 px-4 py-2 flex flex-wrap gap-3 text-sm">
-      <a href="{{ url_for('index') }}" class="text-gray-600 dark:text-gray-400" data-i18n="nav_dashboard">仪表盘</a>
-      <a href="{{ url_for('articles') }}" class="text-gray-600 dark:text-gray-400" data-i18n="nav_articles">文章库</a>
-      <a href="{{ url_for('feeds') }}" class="text-gray-600 dark:text-gray-400" data-i18n="nav_feeds">订阅源</a>
-      <a href="{{ url_for('submit_url') }}" class="text-gray-600 dark:text-gray-400" data-i18n="nav_submit">提交URL</a>
-      <a href="{{ url_for('logs') }}" class="text-gray-600 dark:text-gray-400" data-i18n="nav_logs">日志</a>
-      <a href="{{ url_for('settings') }}" class="text-gray-600 dark:text-gray-400" data-i18n="nav_settings">设置</a>
-    </div>
-  </nav>
+    </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    {% block content %}{% endblock %}
-  </main>
-
-  <footer class="mt-16 py-6 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-400 dark:text-gray-500">
-    <p>Generated by Folio · Local Admin UI</p>
-  </footer>
+    <!-- Page content -->
+    <main class="flex-1 px-8 py-8">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
 
   <script>
-    // ── Theme ──────────────────────────────────────────────────────────────
+    // ── Theme ────────────────────────────────────────────────
+    const html = document.documentElement;
     const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon   = document.getElementById('theme-icon');
-    const html        = document.documentElement;
+    const themeLabel  = document.getElementById('theme-label');
+    const iconDark    = document.getElementById('icon-dark');
+    const iconLight   = document.getElementById('icon-light');
 
     function applyTheme() {
-      const stored = localStorage.getItem('theme') || 'auto';
-      if (stored === 'dark' || (stored === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        html.classList.add('dark');
-        themeIcon.textContent = '☀️';
-      } else {
-        html.classList.remove('dark');
-        themeIcon.textContent = '🌙';
-      }
+      const stored = localStorage.getItem('theme') || 'dark';
+      const isDark = stored === 'dark' || (stored === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      html.classList.toggle('dark', isDark);
+      iconDark.classList.toggle('hidden', isDark);
+      iconLight.classList.toggle('hidden', !isDark);
+      themeLabel.textContent = isDark ? '浅色模式' : '深色模式';
     }
     applyTheme();
     themeToggle.addEventListener('click', () => {
-      const newTheme = html.classList.contains('dark') ? 'light' : 'dark';
-      localStorage.setItem('theme', newTheme);
+      const isDark = html.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
       applyTheme();
     });
 
-    // ── i18n ───────────────────────────────────────────────────────────────
-    const TRANSLATIONS = {
-      zh: {
-        nav_dashboard: '仪表盘', nav_articles: '文章库', nav_feeds: '订阅源',
-        nav_submit: '提交URL', nav_logs: '日志', nav_settings: '设置',
-        unit_articles: '文章', unit_feeds: '订阅',
-        read_original: '阅读原文', regen_summary: '重新生成摘要', gen_summary: '生成详细摘要',
-      },
-      en: {
-        nav_dashboard: 'Dashboard', nav_articles: 'Articles', nav_feeds: 'Feeds',
-        nav_submit: 'Submit URL', nav_logs: 'Logs', nav_settings: 'Settings',
-        unit_articles: 'articles', unit_feeds: 'feeds',
-        read_original: 'Read Original', regen_summary: 'Regenerate Summary', gen_summary: 'Generate Summary',
-      }
-    };
-
-    function applyLang(lang) {
-      const t = TRANSLATIONS[lang] || TRANSLATIONS.zh;
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (t[key]) el.textContent = t[key];
-      });
-      document.getElementById('lang-label').textContent = lang === 'zh' ? 'EN' : '中';
-      html.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en');
-    }
-
-    const langToggle = document.getElementById('lang-toggle');
-    let currentLang = localStorage.getItem('lang') || 'zh';
-    applyLang(currentLang);
-    langToggle.addEventListener('click', () => {
-      currentLang = currentLang === 'zh' ? 'en' : 'zh';
-      localStorage.setItem('lang', currentLang);
-      applyLang(currentLang);
-    });
   </script>
   {% block scripts %}{% endblock %}
 </body>

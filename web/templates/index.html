@@ -1,12 +1,8 @@
 {% extends "base.html" %}
-{% block title %}仪表盘{% endblock %}
+{% block title %}首页{% endblock %}
+{% block page_title %}首页{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-  <h1 class="text-2xl font-bold text-slate-900 dark:text-white">仪表盘</h1>
-  <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">你的公众号阅读知识库</p>
-</div>
-
 <!-- Welcome banner (shown when DB is empty or has only demo data) -->
 {% if stats.total_articles == 0 or (stats.total_articles <= 10 and demo_mode) %}
 <div class="mb-6 card border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20 p-5">

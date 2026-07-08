@@ -129,7 +129,7 @@ git subtree push --prefix site origin gh-pages
 3. Go to **Settings → Pages**, set source to `gh-pages` branch
 4. The workflow runs every hour automatically
 
-## ❓ FAQ
+## 🤔 FAQ
 
 **Q: Can I use this without an AI API key?**
 > No — summarization, tagging, and scoring all require an API call. DeepSeek and Qwen both offer free trial credits and are very affordable.
